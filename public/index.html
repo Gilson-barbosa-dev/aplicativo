@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Top Músicas</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #121212;
+      color: white;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-zinc-900 px-4 sm:px-6 py-3 flex items-center justify-between shadow-md">
+    <div class="flex items-center space-x-2">
+      <div class="w-4 h-4 sm:w-5 sm:h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+      <span class="text-base sm:text-lg font-bold tracking-wide">TOP MÚSICAS</span>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="text-center py-10 sm:py-14 px-4 sm:px-6">
+    <span id="atualizacaoMes"
+      class="text-xs sm:text-sm px-3 sm:px-4 py-1 rounded-full border border-purple-500 text-purple-300 font-semibold inline-block mb-3">
+      Atualização de [mês] já disponível
+    </span>
+    <h1 class="text-3xl sm:text-5xl font-extrabold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent leading-tight">
+      O Maior Pack de Músicas do Brasil
+    </h1>
+    <p class="text-zinc-300 text-sm sm:text-lg mb-6">
+      São mais de <strong>21.354</strong> músicas incluindo sertanejo, pagode, funk, e trape muito mais!<br />
+      <span id="lancamentoData">Lançamentos atualizados para [mês] [ano].</span>
+    </p>
+    <a id="btnDownloadCompleto"
+      class="bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 text-white font-bold py-2 sm:py-3 px-5 sm:px-6 rounded shadow-lg transition text-sm sm:text-base"
+      target="_blank">
+      Download Completo
+    </a>
+
+    <a href="javascript:void(0);" onclick="abrirModalPedido()"
+      class="bg-gradient-to-r from-pink-500 to-purple-500 hover:brightness-110 text-white font-bold py-2 sm:py-3 px-5 sm:px-6 rounded shadow-lg transition text-sm sm:text-base ml-2">
+      Pedir músicas
+    </a>
+  </section>
+
+  <!-- Loader -->
+  <div id="loader" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+    <svg class="animate-spin h-10 w-10 text-pink-500" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+    </svg>
+  </div>
+
+  <!-- Conteúdo principal -->
+  <main class="flex-grow px-3 sm:px-4 pb-10 max-w-5xl mx-auto w-full">
+    <div id="voltarContainer" class="mb-2 hidden">
+      <button onclick="carregarRaiz()" class="text-pink-400 underline text-sm hover:text-pink-300">
+        ← Voltar à Página Principal
+      </button>
+    </div>
+
+    <div class="text-xs sm:text-sm text-gray-400 space-x-1 mb-4 overflow-x-auto whitespace-nowrap" id="breadcrumb">
+    </div>
+
+    <div id="container" class="space-y-4 text-white"></div>
+  </main>
+
+  <!-- Modal de Pedido -->
+<div id="modalPedido" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center px-4">
+  <div class="bg-zinc-900 text-white rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 mx-auto">
+    <h2 class="text-xl font-semibold text-center">Escreva abaixo o artista que deseja solicitar as músicas</h2>
+    
+    <textarea id="inputPedido" rows="4"
+      class="w-full p-3 rounded bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+      placeholder="Ex: João Gomes, MC Ryan SP..."></textarea>
+
+    <div class="flex justify-end space-x-2" id="botoesForm">
+      <button onclick="fecharModalPedido()"
+        class="text-sm px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
+        Cancelar
+      </button>
+      <button onclick="enviarPedido()"
+        class="text-sm px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 font-semibold">
+        Enviar pedido
+      </button>
+    </div>
+
+    <p id="mensagemConfirmacao" class="text-green-400 text-center font-medium hidden">
+      Solicitação enviada, as músicas são adicionadas aqui no aplicativo. Em até 10 dias iremos adicionar.
+    </p>
+
+    <div class="flex justify-center">
+      <button onclick="fecharModalPedido()" id="botaoFecharSucesso"
+        class="hidden text-sm px-4 py-2 mt-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
+        Fechar
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script>
+    const API_BASE = ''; // ← Substitua se sua URL for diferente
+    const caminho = [];
+
+    async function carregarRaiz() {
+      caminho.length = 0;
+      atualizarBreadcrumb();
+      const container = document.getElementById('container');
+      const loader = document.getElementById('loader');
+      container.innerHTML = '';
+      loader.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/raiz`);
+        if (!res.ok) throw new Error('Erro na resposta da API');
+        const itens = await res.json();
+        renderizarItens(itens);
+      } catch (err) {
+        console.error('Erro ao carregar raiz:', err);
+        container.innerHTML = '<p class="text-red-400 font-semibold">Erro ao carregar dados. Verifique a conexão ou API.</p>';
+      } finally {
+        loader.classList.add('hidden');
+      }
+    }
+
+    async function abrirPasta(id, nome) {
+      caminho.push({ id, nome });
+      atualizarBreadcrumb();
+      const container = document.getElementById('container');
+      const loader = document.getElementById('loader');
+      container.innerHTML = '';
+      loader.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/pasta/${id}`);
+        if (!res.ok) throw new Error('Erro na resposta da API');
+        const itens = await res.json();
+        renderizarItens(itens);
+      } catch (err) {
+        console.error('Erro ao carregar pasta:', err);
+        container.innerHTML = '<p class="text-red-400 font-semibold">Erro ao carregar essa pasta.</p>';
+      } finally {
+        loader.classList.add('hidden');
+      }
+    }
+
+    function voltarPara(index) {
+      caminho.splice(index + 1);
+      const atual = caminho[caminho.length - 1];
+      if (atual) abrirPasta(atual.id, atual.nome);
+      else carregarRaiz();
+    }
+
+    function atualizarBreadcrumb() {
+      const bc = document.getElementById('breadcrumb');
+      const voltar = document.getElementById('voltarContainer');
+      if (caminho.length === 0) {
+        bc.innerHTML = '';
+        voltar.classList.add('hidden');
+        return;
+      }
+      bc.innerHTML = caminho
+        .map((p, i) => `<button onclick="voltarPara(${i})" class="hover:underline">${p.nome}</button>`)
+        .join('<span class="text-gray-500"> &gt; </span>');
+      voltar.classList.remove('hidden');
+    }
+
+    function renderizarItens(itens) {
+      const container = document.getElementById('container');
+      container.innerHTML = '';
+
+      if (itens.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 italic">Esta pasta está vazia.</p>';
+        return;
+      }
+
+      itens.sort((a, b) => a.nome.localeCompare(b.nome, undefined, { numeric: true, sensitivity: 'base' }));
+
+      const pastas = itens.filter(i => i.tipo === 'pasta');
+      const musicas = itens.filter(i => i.tipo === 'musica');
+
+      if (pastas.length > 0) {
+        const grid = document.createElement('div');
+        grid.className = 'grid grid-cols-1 gap-3';
+
+        pastas.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'bg-zinc-800 p-4 rounded-xl shadow flex items-center justify-between hover:bg-zinc-700 transition cursor-pointer group';
+          card.onclick = () => abrirPasta(item.id, item.nome);
+
+          card.innerHTML = `
+            <div class="flex items-center space-x-2 text-sm font-medium">
+              <span class="text-yellow-400 text-lg">📁</span>
+              <span class="truncate">${item.nome}</span>
+            </div>
+            <a href="https://drive.google.com/drive/folders/${item.id}" target="_blank" onclick="event.stopPropagation()" title="Abrir no Drive"
+               class="text-blue-400 bg-zinc-900 group-hover:bg-zinc-800 p-2 rounded-lg hover:text-blue-300 transition">
+              ⬇️
+            </a>
+          `;
+
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      }
+
+      if (musicas.length > 0) {
+        const lista = document.createElement('div');
+        lista.className = 'mt-6 space-y-3';
+
+        musicas.forEach(musica => {
+          const item = document.createElement('div');
+          item.className = 'flex items-center justify-between bg-zinc-800 px-4 py-3 rounded-xl shadow hover:bg-zinc-700 transition';
+
+          item.innerHTML = `
+            <div class="flex items-center gap-2 min-w-0 text-sm font-medium">
+              <span class="text-pink-400 text-lg shrink-0">🎵</span>
+              <span class="truncate block text-white w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                ${musica.nome}
+              </span>
+            </div>
+            <a href="${musica.link}" download title="Baixar música"
+               class="text-green-400 bg-zinc-900 hover:bg-zinc-800 p-2 rounded-lg hover:text-green-300 transition shrink-0 ml-2">
+              ⬇️
+            </a>
+          `;
+
+          lista.appendChild(item);
+        });
+
+        container.appendChild(lista);
+      }
+    }
+
+    fetch(`${API_BASE}/api/download`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('btnDownloadCompleto').href = data.url;
+      })
+      .catch(() => {
+        document.getElementById('btnDownloadCompleto').href = '#';
+      });
+
+    carregarRaiz();
+  </script>
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "shhu6i9s94");
+</script>
+
+<script>
+  function abrirModalPedido() {
+    document.getElementById('modalPedido').classList.remove('hidden');
+    document.getElementById('mensagemConfirmacao').classList.add('hidden');
+  }
+
+  function fecharModalPedido() {
+  document.getElementById('modalPedido').classList.add('hidden');
+  document.getElementById('inputPedido').value = '';
+  document.getElementById('mensagemConfirmacao').classList.add('hidden');
+  document.getElementById('botaoFecharSucesso').classList.add('hidden');
+  document.getElementById('botoesForm').classList.remove('hidden');
+  }
+
+
+  async function enviarPedido() {
+  const texto = document.getElementById('inputPedido').value.trim();
+  if (!texto) return alert('Digite o nome do artista!');
+
+  try {
+    const res = await fetch('/api/pedido', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto })
+    });
+
+    if (!res.ok) throw new Error('Erro ao enviar pedido');
+
+    // Sucesso: esconde inputs e mostra mensagem e botão fechar
+    document.getElementById('inputPedido').value = '';
+    document.getElementById('mensagemConfirmacao').classList.remove('hidden');
+    document.getElementById('botoesForm').classList.add('hidden');
+    document.getElementById('botaoFecharSucesso').classList.remove('hidden');
+
+  } catch (err) {
+    alert('Erro ao enviar o pedido. Tente novamente mais tarde.');
+  }
+}
+
+function atualizarDatasDinamicamente() {
+  const agora = new Date();
+  const mes = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(agora);
+  const ano = agora.getFullYear();
+
+  // Capitalizar a primeira letra
+  const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1);
+
+  // Atualizar elementos no DOM
+  const elAtualizacao = document.getElementById('atualizacaoMes');
+  const elLancamento = document.getElementById('lancamentoData');
+
+  if (elAtualizacao)
+    elAtualizacao.textContent = `Atualização de ${mesCapitalizado} já disponível`;
+
+  if (elLancamento)
+    elLancamento.textContent = `Lançamentos atualizados para ${mesCapitalizado} ${ano}.`;
+}
+
+// Executa ao carregar
+atualizarDatasDinamicamente();
+</script>
+
+</body>
+
+</html>
