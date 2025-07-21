@@ -199,7 +199,9 @@
           card.innerHTML = `
             <div class="flex items-center space-x-2 text-sm font-medium">
               <span class="text-yellow-400 text-lg">📁</span>
-              <span class="truncate">${item.nome}</span>
+              <span class="break-words whitespace-normal text-white text-sm sm:text-base leading-snug">
+                ${item.nome}
+              </span>
             </div>
             <a href="https://drive.google.com/drive/folders/${item.id}" target="_blank" onclick="event.stopPropagation()" title="Abrir no Drive"
                class="text-blue-400 bg-zinc-900 group-hover:bg-zinc-800 p-2 rounded-lg hover:text-blue-300 transition">
