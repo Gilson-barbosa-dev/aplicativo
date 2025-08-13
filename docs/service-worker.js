@@ -1,4 +1,4 @@
-const CACHE_NAME = "top-musicas-cache-v1";
+const CACHE_NAME = "top-musicas-cache-v2";
 const urlsToCache = [
   "/",
   "/index.html",
@@ -15,6 +15,7 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
   );
+  self.skipWaiting(); // Assume controle imediatamente
 });
 
 // Ativação e limpeza de cache antigo
@@ -24,11 +25,15 @@ self.addEventListener("activate", (event) => {
       Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
     )
   );
+  clients.claim(); // Controla todas as abas abertas
 });
 
 // Intercepta requisições para servir do cache
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => response || fetch(event.request))
+    caches.match(event.request).then((response) => {
+      // Retorna do cache ou busca na rede
+      return response || fetch(event.request);
+    })
   );
 });
