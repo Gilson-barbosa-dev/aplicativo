@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu App</title>
+
+  <!-- Manifesto -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <!-- Registrar Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js")
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(err => console.error("❌ Erro no SW:", err));
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #btnInstalar {
+      padding: 12px 20px;
+      background: #25d366;
+      color: #fff;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-block;
+    }
+    #instrucoesIOS {
+      display: none;
+      margin-top: 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📲 Meu Aplicativo</h1>
+  <p>Instale este app para acesso rápido!</p>
+
+  <button id="btnInstalar">📲 Baixar App</button>
+
+  <div id="instrucoesIOS">
+    <p>No iPhone:</p>
+    <p>1️⃣ Toque no botão <strong>Compartilhar</strong></p>
+    <p>2️⃣ Escolha <strong>Adicionar à tela de início</strong></p>
+  </div>
+
+  <script>
+    let eventoInstalacao;
+    const botao = document.getElementById('btnInstalar');
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const instrucoesIOS = document.getElementById('instrucoesIOS');
+
+    // Detecta se está em ambiente permitido (localhost, 127.0.0.1 ou HTTPS)
+    const isAmbientePermitido =
+      location.protocol === "https:" ||
+      location.hostname === "localhost" ||
+      location.hostname === "127.0.0.1";
+
+    if (isIOS) {
+      botao.addEventListener('click', () => {
+        instrucoesIOS.style.display = 'block';
+      });
+    } else {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        eventoInstalacao = e;
+        console.log("📌 Evento beforeinstallprompt capturado");
+      });
+
+      botao.addEventListener('click', () => {
+        if (eventoInstalacao && isAmbientePermitido) {
+          eventoInstalacao.prompt();
+        } else if (!isAmbientePermitido) {
+          alert("⚠️ O prompt real só aparece no Chrome com HTTPS, localhost ou 127.0.0.1.");
+        } else {
+          alert("ℹ️ Aguarde alguns segundos ou navegue no site antes de tentar instalar.");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
