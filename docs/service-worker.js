@@ -13,23 +13,23 @@ const urlsToCache = [
 // Instalação do Service Worker
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    }).catch((err) => {
+      console.error("Erro ao adicionar arquivos no cache", err);
+    })
   );
-  self.skipWaiting(); // Ativa imediatamente
+  self.skipWaiting();
 });
 
 // Ativação e limpeza de caches antigos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
     )
   );
-  clients.claim(); // Assume controle das abas abertas
+  clients.claim();
 });
 
 // Intercepta requisições e responde do cache quando possível
