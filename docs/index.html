@@ -111,6 +111,22 @@
     </div>
   </div>
 </div>
+<div id="installPrompt" class="hidden fixed bottom-5 right-5 bg-zinc-900 text-white p-4 rounded-xl shadow-xl border border-purple-500 w-80 z-50">
+  <div class="flex items-center space-x-3">
+    <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-2 rounded-lg">
+      📱
+    </div>
+    <div class="flex-1">
+      <p class="font-bold text-sm">Instalar Top Músicas</p>
+      <p class="text-xs text-gray-300">Acesso rápido e offline</p>
+    </div>
+    <button id="closeInstallPrompt" class="text-gray-400 hover:text-white">✕</button>
+  </div>
+  <div class="flex justify-end space-x-2 mt-3">
+    <button id="installBtn" class="bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-1 rounded-lg text-sm font-semibold">Instalar</button>
+  </div>
+</div>
+
 
   <script>
     const API_BASE = ''; // ← Substitua se sua URL for diferente
@@ -360,6 +376,28 @@ atualizarDatasDinamicamente();
     });
   });
 </script>
+<script>
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installPrompt').classList.remove('hidden');
+  });
+
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    document.getElementById('installPrompt').classList.add('hidden');
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('Resultado:', outcome);
+    deferredPrompt = null;
+  });
+
+  document.getElementById('closeInstallPrompt').addEventListener('click', () => {
+    document.getElementById('installPrompt').classList.add('hidden');
+  });
+</script>
+
 
 
 </body>
