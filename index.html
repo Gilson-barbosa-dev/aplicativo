@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Manifest -->
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#121212">
 
@@ -83,40 +85,40 @@
   </main>
 
   <!-- Modal de Pedido -->
-<div id="modalPedido" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center px-4">
-  <div class="bg-zinc-900 text-white rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 mx-auto">
-    <h2 class="text-xl font-semibold text-center">Escreva abaixo o artista que deseja solicitar as músicas</h2>
-    
-    <textarea id="inputPedido" rows="4"
-      class="w-full p-3 rounded bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
-      placeholder="Ex: João Gomes, MC Ryan SP..."></textarea>
+  <div id="modalPedido" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center px-4">
+    <div class="bg-zinc-900 text-white rounded-xl shadow-lg max-w-md w-full p-6 space-y-4 mx-auto">
+      <h2 class="text-xl font-semibold text-center">Escreva abaixo o artista que deseja solicitar as músicas</h2>
+      
+      <textarea id="inputPedido" rows="4"
+        class="w-full p-3 rounded bg-zinc-800 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 resize-none"
+        placeholder="Ex: João Gomes, MC Ryan SP..."></textarea>
 
-    <div class="flex justify-end space-x-2" id="botoesForm">
-      <button onclick="fecharModalPedido()"
-        class="text-sm px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
-        Cancelar
-      </button>
-      <button onclick="enviarPedido()"
-        class="text-sm px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 font-semibold">
-        Enviar pedido
-      </button>
-    </div>
+      <div class="flex justify-end space-x-2" id="botoesForm">
+        <button onclick="fecharModalPedido()"
+          class="text-sm px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
+          Cancelar
+        </button>
+        <button onclick="enviarPedido()"
+          class="text-sm px-4 py-2 rounded bg-gradient-to-r from-purple-500 to-pink-500 hover:brightness-110 font-semibold">
+          Enviar pedido
+        </button>
+      </div>
 
-    <p id="mensagemConfirmacao" class="text-green-400 text-center font-medium hidden">
-      Solicitação enviada, as músicas são adicionadas aqui no aplicativo. Em até 10 dias iremos adicionar.
-    </p>
+      <p id="mensagemConfirmacao" class="text-green-400 text-center font-medium hidden">
+        Solicitação enviada, as músicas são adicionadas aqui no aplicativo. Em até 10 dias iremos adicionar.
+      </p>
 
-    <div class="flex justify-center">
-      <button onclick="fecharModalPedido()" id="botaoFecharSucesso"
-        class="hidden text-sm px-4 py-2 mt-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
-        Fechar
-      </button>
+      <div class="flex justify-center">
+        <button onclick="fecharModalPedido()" id="botaoFecharSucesso"
+          class="hidden text-sm px-4 py-2 mt-2 rounded bg-zinc-700 hover:bg-zinc-600 transition">
+          Fechar
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
   <script>
-    const API_BASE = ''; // ← Substitua se sua URL for diferente
+    const API_BASE = '';
     const caminho = [];
 
     async function carregarRaiz() {
@@ -134,7 +136,7 @@
         renderizarItens(itens);
       } catch (err) {
         console.error('Erro ao carregar raiz:', err);
-        container.innerHTML = '<p class="text-red-400 font-semibold">Erro ao carregar dados. Verifique a conexão ou API.</p>';
+        container.innerHTML = '<p class="text-red-400 font-semibold">Erro ao carregar dados.</p>';
       } finally {
         loader.classList.add('hidden');
       }
@@ -217,7 +219,6 @@
               ⬇️
             </a>
           `;
-
           grid.appendChild(card);
         });
 
@@ -244,7 +245,6 @@
               ⬇️
             </a>
           `;
-
           lista.appendChild(item);
         });
 
@@ -263,82 +263,69 @@
 
     carregarRaiz();
   </script>
-  <script type="text/javascript">
-    (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    })(window, document, "clarity", "script", "shhu6i9s94");
-</script>
 
-<script>
-  function abrirModalPedido() {
-    document.getElementById('modalPedido').classList.remove('hidden');
-    document.getElementById('mensagemConfirmacao').classList.add('hidden');
-  }
+  <script>
+    function abrirModalPedido() {
+      document.getElementById('modalPedido').classList.remove('hidden');
+      document.getElementById('mensagemConfirmacao').classList.add('hidden');
+    }
 
-  function fecharModalPedido() {
-  document.getElementById('modalPedido').classList.add('hidden');
-  document.getElementById('inputPedido').value = '';
-  document.getElementById('mensagemConfirmacao').classList.add('hidden');
-  document.getElementById('botaoFecharSucesso').classList.add('hidden');
-  document.getElementById('botoesForm').classList.remove('hidden');
-  }
+    function fecharModalPedido() {
+      document.getElementById('modalPedido').classList.add('hidden');
+      document.getElementById('inputPedido').value = '';
+      document.getElementById('mensagemConfirmacao').classList.add('hidden');
+      document.getElementById('botaoFecharSucesso').classList.add('hidden');
+      document.getElementById('botoesForm').classList.remove('hidden');
+    }
 
+    async function enviarPedido() {
+      const texto = document.getElementById('inputPedido').value.trim();
+      if (!texto) return alert('Digite o nome do artista!');
 
-  async function enviarPedido() {
-  const texto = document.getElementById('inputPedido').value.trim();
-  if (!texto) return alert('Digite o nome do artista!');
+      try {
+        const res = await fetch('/api/pedido', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ texto })
+        });
 
-  try {
-    const res = await fetch('/api/pedido', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ texto })
-    });
+        if (!res.ok) throw new Error('Erro ao enviar pedido');
 
-    if (!res.ok) throw new Error('Erro ao enviar pedido');
+        document.getElementById('inputPedido').value = '';
+        document.getElementById('mensagemConfirmacao').classList.remove('hidden');
+        document.getElementById('botoesForm').classList.add('hidden');
+        document.getElementById('botaoFecharSucesso').classList.remove('hidden');
 
-    // Sucesso: esconde inputs e mostra mensagem e botão fechar
-    document.getElementById('inputPedido').value = '';
-    document.getElementById('mensagemConfirmacao').classList.remove('hidden');
-    document.getElementById('botoesForm').classList.add('hidden');
-    document.getElementById('botaoFecharSucesso').classList.remove('hidden');
+      } catch (err) {
+        alert('Erro ao enviar o pedido. Tente novamente mais tarde.');
+      }
+    }
 
-  } catch (err) {
-    alert('Erro ao enviar o pedido. Tente novamente mais tarde.');
-  }
-}
+    function atualizarDatasDinamicamente() {
+      const agora = new Date();
+      const mes = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(agora);
+      const ano = agora.getFullYear();
+      const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1);
 
-function atualizarDatasDinamicamente() {
-  const agora = new Date();
-  const mes = new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(agora);
-  const ano = agora.getFullYear();
+      const elAtualizacao = document.getElementById('atualizacaoMes');
+      const elLancamento = document.getElementById('lancamentoData');
 
-  // Capitalizar a primeira letra
-  const mesCapitalizado = mes.charAt(0).toUpperCase() + mes.slice(1);
+      if (elAtualizacao)
+        elAtualizacao.textContent = `Atualização de ${mesCapitalizado} já disponível`;
 
-  // Atualizar elementos no DOM
-  const elAtualizacao = document.getElementById('atualizacaoMes');
-  const elLancamento = document.getElementById('lancamentoData');
+      if (elLancamento)
+        elLancamento.textContent = `Lançamentos atualizados para ${mesCapitalizado} ${ano}.`;
+    }
 
-  if (elAtualizacao)
-    elAtualizacao.textContent = `Atualização de ${mesCapitalizado} já disponível`;
+    atualizarDatasDinamicamente();
+  </script>
 
-  if (elLancamento)
-    elLancamento.textContent = `Lançamentos atualizados para ${mesCapitalizado} ${ano}.`;
-}
-
-// Executa ao carregar
-atualizarDatasDinamicamente();
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/aplicativo/sw.js')
-    .then(() => console.log("✅ Service Worker registrado"))
-    .catch(err => console.error("❌ Erro ao registrar o Service Worker", err));
-}
-</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then(() => console.log("✅ Service Worker registrado"))
+        .catch(err => console.error("❌ Erro ao registrar o Service Worker", err));
+    }
+  </script>
 </body>
-
 </html>
