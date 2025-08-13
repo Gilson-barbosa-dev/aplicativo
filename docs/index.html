@@ -341,32 +341,32 @@
   </script>
 
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(() => console.log('Service Worker registrado!'))
-        .catch(err => console.error('Erro no SW:', err));
-    }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/aplicativo/service-worker.js')
+      .then(() => console.log('Service Worker registrado!'))
+      .catch(err => console.error('Erro no SW:', err));
+  }
 
-    let deferredPrompt;
+  let deferredPrompt;
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installPrompt').classList.remove('hidden');
-    });
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installPrompt').classList.remove('hidden');
+  });
 
-    document.getElementById('installBtn').addEventListener('click', async () => {
-      document.getElementById('installPrompt').classList.add('hidden');
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log('Resultado:', outcome);
-      deferredPrompt = null;
-    });
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    document.getElementById('installPrompt').classList.add('hidden');
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log('Resultado:', outcome);
+    deferredPrompt = null;
+  });
 
-    document.getElementById('closeInstallPrompt').addEventListener('click', () => {
-      document.getElementById('installPrompt').classList.add('hidden');
-    });
-  </script>
+  document.getElementById('closeInstallPrompt').addEventListener('click', () => {
+    document.getElementById('installPrompt').classList.add('hidden');
+  });
+</script>
 
 </body>
 </html>
