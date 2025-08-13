@@ -334,12 +334,11 @@ atualizarDatasDinamicamente();
 </script>
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-    .then(() => console.log('Service Worker registrado'));
+  navigator.serviceWorker.register('/aplicativo/sw.js')
+    .then(() => console.log("✅ Service Worker registrado"))
+    .catch(err => console.error("❌ Erro ao registrar o Service Worker", err));
 }
 </script>
-
-
 </body>
 
 </html>
